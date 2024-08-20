@@ -26,6 +26,11 @@ This repository contains a comprehensive Python script designed to automate vari
 ### 5. **SES Email Automation**
    - **Send Emails Using SES**: The script retrieves email addresses from an S3 file and sends emails to each address using AWS SES. It allows you to specify the subject and body of the email.
 
+### 6. **RHEL GUI Setup**
+   - **Launch RHEL Instance**: The script launches an EC2 instance with RHEL and installs a graphical user interface (GUI).
+   - **Configure Remote Access**: Sets up the instance for remote desktop access using RDP (Remote Desktop Protocol), allowing you to connect to the GUI from anywhere.
+
+
 ## Usage
 
 1. **AWS Session Initialization:**  
@@ -55,7 +60,12 @@ This repository contains a comprehensive Python script designed to automate vari
    ```python
    send_emails_to_s3_list('your-bucket-name', 'email_ids.txt', session, 'Your Email Subject', 'Your Email Body')
    ```
-
+7. **Install and Configure RHEL GUI:**  
+   ```python
+   rhel_instance_id = launch_rhel_instance(session, 'ami-xxxxxxx')  # Replace with RHEL AMI ID
+   configure_rhel_gui(session, rhel_instance_id)
+   ```
+   
 ### Menu-Driven Interface
 
 The script comes with an interactive menu that guides you through each function step by step, making it easy to manage your AWS resources without needing to write additional code.
@@ -73,7 +83,8 @@ The script comes with an interactive menu that guides you through each function 
 9. Get Transcription Result
 10. Connect to MongoDB
 11. Send Emails to S3 List
-12. Exit
+12. RHEL GUI Setup on AWS
+13. Exit
 ```
 
 ### Prerequisites
@@ -83,6 +94,7 @@ The script comes with an interactive menu that guides you through each function 
 - paramiko for SSH communication
 - AWS credentials (Access Key ID and Secret Access Key)
 - PEM file for SSH access to EC2
+- RHEL AMI ID
 
 ### Installation
 
