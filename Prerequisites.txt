@@ -1,60 +1,66 @@
 General Prerequisites:
 
 
-AWS Account: Ensure you have an active AWS account with access credentials (AWS Access Key ID and Secret Access Key).
-AWS CLI Configuration: Install the AWS CLI and configure it with your credentials.
-Boto3 Library: Install the boto3 library to interact with AWS services:
-pip install boto3
-Paramiko Library: Install the paramiko library for SSH connections:
-pip install paramiko
-Key Pair: Create an SSH key pair in the AWS Management Console and download the .pem file. Store it securely.
+1. AWS Account: Ensure you have an active AWS account with access credentials (AWS Access Key ID and Secret Access Key).
+2. AWS CLI Configuration: Install the AWS CLI and configure it with your credentials.
+3. Boto3 Library: Install the boto3 library to interact with AWS services:
+==> pip install boto3
+4. Paramiko Library: Install the paramiko library for SSH connections:
+==> pip install paramiko
+5. Key Pair: Create an SSH key pair in the AWS Management Console and download the .pem file. Store it securely.
 
 
 Task-Specific Prerequisites:
 
 
 1. Launch EC2 Instance (launch_ec2_instance):
-Amazon Machine Image (AMI) ID: Identify the AMI ID for the instance you want to launch. Ensure it’s available in your desired region.
-Key Pair: Make sure you have an SSH key pair set up for connecting to the instance.
-Instance Type: Decide on the instance type (e.g., t2.micro).
+* Amazon Machine Image (AMI) ID: Identify the AMI ID for the instance you want to launch. Ensure it’s available in your desired region.
+* Key Pair: Make sure you have an SSH key pair set up for connecting to the instance.
+* Instance Type: Decide on the instance type (e.g., t2.micro).
 
 2. Start EC2 Instance (start_ec2_instance):
-Instance ID: Obtain the instance ID of the EC2 instance you want to start.
+* Instance ID: Obtain the instance ID of the EC2 instance you want to start.
 
 3. Stop EC2 Instance (stop_ec2_instance):
-Instance ID: Obtain the instance ID of the EC2 instance you want to stop.
+* Instance ID: Obtain the instance ID of the EC2 instance you want to stop.
 
 4. Terminate EC2 Instance (terminate_ec2_instance):
-Instance ID: Obtain the instance ID of the EC2 instance you want to terminate.
+* Instance ID: Obtain the instance ID of the EC2 instance you want to terminate.
 
 5. Get EC2 Console Output (get_ec2_console_output):
-Instance ID: Obtain the instance ID of the EC2 instance from which you want to retrieve the console output.
+* Instance ID: Obtain the instance ID of the EC2 instance from which you want to retrieve the console output.
 
 6. Create S3 Bucket (create_s3_bucket):
-Unique Bucket Name: Choose a unique bucket name that complies with S3 naming conventions (globally unique, no uppercase letters, etc.).
-Region: Decide on the AWS region where you want to create the bucket.
+* Unique Bucket Name: Choose a unique bucket name that complies with S3 naming conventions (globally unique, no uppercase letters, etc.).
+* Region: Decide on the AWS region where you want to create the bucket.
 
 7. Upload File to S3 (upload_to_s3):
-S3 Bucket: Ensure the target S3 bucket exists and you have permissions to upload files to it.
-File Path: Specify the local path of the file you want to upload.
-S3 Key (Optional): Define the S3 key (object name) if you want to give it a different name in the bucket.
+* S3 Bucket: Ensure the target S3 bucket exists and you have permissions to upload files to it.
+* File Path: Specify the local path of the file you want to upload.
+* S3 Key (Optional): Define the S3 key (object name) if you want to give it a different name in the bucket.
 
 8. Start Transcription Job (start_transcription_job):
-S3 Bucket: Ensure the S3 bucket containing the audio file exists and is accessible.
-Audio File: Upload the audio file to the S3 bucket.
-Job Name: Choose a unique name for the transcription job.
-Language Code: Determine the language code (e.g., en-US for English).
+* S3 Bucket: Ensure the S3 bucket containing the audio file exists and is accessible.
+* Audio File: Upload the audio file to the S3 bucket.
+* Job Name: Choose a unique name for the transcription job.
+* Language Code: Determine the language code (e.g., en-US for English).
 
 9. Get Transcription Result (get_transcription_result):
-Transcription Job Name: Obtain the name of the transcription job you want to monitor or retrieve results from.
+* Transcription Job Name: Obtain the name of the transcription job you want to monitor or retrieve results from.
 
 10. Connect to MongoDB (connect_to_mongoDB):
-Security Group: Ensure the necessary ports (e.g., 27017 for MongoDB) are open in the security group.
-Key Pair: Use the SSH key pair for connecting to the EC2 instance.
-AMI ID: Use a Linux AMI (e.g., Ubuntu) that supports MongoDB installation.
+* Security Group: Ensure the necessary ports (e.g., 27017 for MongoDB) are open in the security group.
+* Key Pair: Use the SSH key pair for connecting to the EC2 instance.
+* AMI ID: Use a Linux AMI (e.g., Ubuntu) that supports MongoDB installation.
 
 11. Send Emails to S3 List (send_emails_to_s3_list):
-S3 Bucket: Ensure the S3 bucket containing the email list exists.
-S3 Key: The key (file name) of the text file in S3 containing the email addresses.
-Verified Email Addresses: Verify the sender email address in AWS SES.
-SES Setup: Ensure SES is set up and in the same region as your S3 bucket.
+* S3 Bucket: Ensure the S3 bucket containing the email list exists.
+* S3 Key: The key (file name) of the text file in S3 containing the email addresses.
+* Verified Email Addresses: Verify the sender email address in AWS SES.
+* SES Setup: Ensure SES is set up and in the same region as your S3 bucket.
+
+12. Install and Configure RHEL GUI (rhel_gui_setup):
+* Amazon Machine Image (AMI) ID: Use an AMI ID for RHEL with a GUI.
+* Key Pair: Ensure you have an SSH key pair for connecting to the EC2 instance.
+* Instance Type: Decide on the instance type (e.g., t2.micro).
+* RDP Configuration: Configure the RHEL instance for remote desktop access using tools like xrdp.
