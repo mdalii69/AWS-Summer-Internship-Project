@@ -233,6 +233,117 @@ def send_emails_to_s3_list(bucket_name, s3_key, session, email_subject, email_bo
         except Exception as e:
             print(f"Error sending email to {email_id}: {e}")
 
+# Create Security Group
+def create_security_group(session,security_group_name):
+    ec2 = session.client("ec2")
+    try:
+        response = ec2.create_security_group(
+            GroupName=security_group_name,
+            Description="Security group for RHEL GUI setup",
+        )
+        security_group_id = response["GroupId"]
+
+        ec2.authorize_security_group_ingress(
+            GroupId=security_group_id,
+            IpPermissions=[
+                {
+                    "IpProtocol": "tcp",
+                    "FromPort": 22,
+                    "ToPort": 22,
+                    "IpRanges": [{"CidrIp": "0.0.0.0/0"}],
+                },
+                {
+                    "IpProtocol": "tcp",
+                    "FromPort": 3389,
+                    "ToPort": 3389,
+                    "IpRanges": [{"CidrIp": "0.0.0.0/0"}],  # RDP
+                },
+            ],
+        )
+        return security_group_id
+    except Exception as e:
+        print(f"Error creating security group: {e}")
+        return None
+
+# Launch EC2 instance
+def launch_ec2_instance(session,security_group_id,ami_id,instance_type,key_name):
+    ec2 = session.client("ec2")
+    try:
+        response = ec2.run_instances(
+            ImageId=ami_id,
+            InstanceType=instance_type,
+            KeyName=key_name,
+            MinCount=1,
+            MaxCount=1,
+            SecurityGroupIds=[security_group_id],
+            TagSpecifications=[
+                {
+                    "ResourceType": "instance",
+                    "Tags": [{"Key": "Name", "Value": "RHEL-GUI-Instance"}],
+                }
+            ],
+        )
+        instance_id = response["Instances"][0]["InstanceId"]
+        print(f"Instance {instance_id} launched, waiting for it to be running...")
+        ec2.get_waiter("instance_running").wait(InstanceIds=[instance_id])
+        print(f"Instance {instance_id} is running.")
+        return instance_id
+    except Exception as e:
+        print(f"Error launching instance: {e}")
+        return None
+
+# Configure the instance with GUI and RDP
+def configure_instance(session,instance_id):
+    ec2 = session.client("ec2")
+    try:
+        # Get instance details for connection
+        instance_info = ec2.describe_instances(InstanceIds=[instance_id])
+        instance = instance_info["Reservations"][0]["Instances"][0]
+        public_dns = instance["PublicDnsName"]
+        print(f"Public DNS: {public_dns}")
+
+        # SSH into the instance and configure GUI and RDP
+        import paramiko
+
+        ssh = paramiko.SSHClient()
+        ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+        ssh.connect(public_dns, username="ec2-user", key_filename="C:\\VS Code\\Project\\my-key-pair.pem")
+
+        commands = [
+            "sudo yum groupinstall 'Server with GUI' -y",
+            "sudo systemctl set-default graphical.target",
+            "sudo systemctl start graphical.target",
+            "sudo yum install -y xrdp",
+            "sudo systemctl enable xrdp",
+            "sudo systemctl start xrdp",
+        ]
+
+        for command in commands:
+            stdin, stdout, stderr = ssh.exec_command(command)
+            stdout.channel.recv_exit_status()  # Block until command finishes
+            print(stdout.read().decode())
+
+        ssh.close()
+        print("GUI and RDP setup completed.")
+    except Exception as e:
+        print(f"Error configuring instance: {e}")
+
+def GUI_RHEL(session,ami_id,instance_type,key_name,security_group_name):
+    # Step 1: Create a Security Group
+    security_group_id = create_security_group(session,security_group_name)
+    if not security_group_id:
+        print("Failed to create security group. Exiting.")
+        return
+
+    # Step 2: Launch EC2 Instance
+    instance_id = launch_ec2_instance(session,security_group_id,ami_id,instance_type,key_name)
+    if not instance_id:
+        print("Failed to launch EC2 instance. Exiting.")
+        return
+
+    # Step 3: Configure the Instance (Install GUI, Configure RDP)
+    configure_instance(session,instance_id)
+
 def menu():
     aws_access_key_id ="enter_your_access_key_id"
     aws_secret_access_key ="enter_your_secret_access_key"
@@ -251,7 +362,8 @@ def menu():
         print("9. Get Transcription Result")
         print("10. Connect to MongoDB")
         print("11. Send Emails to S3 List")
-        print("12. Exit")
+        print("12. RHEL GUI Setup on AWS")
+        print('13. Exit')
 
         choice = input("Enter choice: ")
 
@@ -306,6 +418,13 @@ def menu():
             send_emails_to_s3_list(bucket_name, s3_key, session, email_subject, email_body)
             input("Press Enter to return to the main menu...")
         elif choice == '12':
+            ami_id = "ami-022ce6f32988af5fa"  # Replace with the AMI ID for RHEL
+            instance_type = "t2.micro"  # Free tier eligible
+            key_name = "my-key-pair"  # Replace with your key pair name
+            security_group_name = "rhel-gui-sg"
+            GUI_RHEL(session,ami_id,instance_type,key_name,security_group_name)
+            input("Press Enter to return to the main menu...")
+        elif choice == '13':
             print("Exiting...")
             break
         else:
